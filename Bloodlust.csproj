@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Version>0.1.0</Version>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <Sts2Dir Condition="'$(Sts2Dir)' == ''">$(HOME)/.local/share/Steam/steamapps/common/Slay the Spire 2</Sts2Dir>
+    <Sts2DataDir>$(Sts2Dir)/data_sts2_linuxbsd_x86_64</Sts2DataDir>
+    <Sts2InstallDir>$(Sts2Dir)/mods/$(AssemblyName)</Sts2InstallDir>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="sts2" HintPath="$(Sts2DataDir)/sts2.dll" Private="false" />
+    <Reference Include="GodotSharp" HintPath="$(Sts2DataDir)/GodotSharp.dll" Private="false" />
+    <Reference Include="0Harmony" HintPath="$(Sts2DataDir)/0Harmony.dll" Private="false" />
+    <PackageReference Include="Alchyr.Sts2.BaseLib" Version="3.4.7" PrivateAssets="all" />
+    <None Update="Bloodlust.json" CopyToOutputDirectory="PreserveNewest" />
+    <Compile Remove="tests/**" />
+  </ItemGroup>
+  <Target Name="CheckGame" BeforeTargets="ResolveReferences">
+    <Error Condition="!Exists('$(Sts2DataDir)/sts2.dll')" Text="Set Sts2Dir to the installed game directory." />
+  </Target>
+  <!-- The loader wants mods/<id>/<id>.dll next to <id>.json. -p:SkipModInstall=true to skip. -->
+  <Target Name="InstallToGame" AfterTargets="Build" Condition="'$(SkipModInstall)' != 'true'">
+    <MakeDir Directories="$(Sts2InstallDir)" />
+    <Copy SourceFiles="$(TargetPath);$(MSBuildProjectDirectory)/Bloodlust.json" DestinationFolder="$(Sts2InstallDir)" />
+    <Message Importance="high" Text="Installed $(AssemblyName) -> $(Sts2InstallDir)" />
+  </Target>
+</Project>
