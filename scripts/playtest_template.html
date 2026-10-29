@@ -52,6 +52,14 @@ blockquote cite { display: block; margin-top: 6px; font-style: normal; font-size
   font-variant-numeric: tabular-nums; text-align: center; }
 .bank-axis span:nth-child(odd) { visibility: hidden; }
 @media (min-width: 720px) { .bank-axis span:nth-child(odd) { visibility: visible; } }
+/* Reference lines over the bars: Bloodlust's average and Akabeko's flat 8. */
+.bank-plot { position: relative; }
+.ref { position: absolute; left: 0; right: 0; height: 0; border-top: 2px solid var(--ink); pointer-events: none; }
+.ref.akabeko { border-top-style: dashed; border-top-color: var(--muted); }
+.ref span { position: absolute; bottom: 3px; padding: 0 4px; font-size: .72rem; line-height: 1.2; color: var(--ink);
+  background: var(--bg); border-radius: 3px; white-space: nowrap; }
+.ref.avg span { right: 0; } .ref.akabeko span { left: 0; color: var(--muted); }
+.bank-sum b { color: var(--ink); font-variant-numeric: tabular-nums; }
 
 .fight { display: grid; gap: 8px; scroll-margin-top: 16px; padding-top: 18px; border-top: 1px solid var(--line); }
 .head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
@@ -101,7 +109,8 @@ dialog::backdrop { background: #07090d; }
     <h2 id="bank-h">Overkill banked per fight</h2>
     <p class="hint">Each bar is what that fight stored, out of {{CAP}}, and is the <span class="vg">Vigor</span> the next fight
       opened with. Click a bar to jump to the fight.</p>
-    <div class="bank-chart" id="bank-chart"></div>
+    <p class="hint bank-sum" id="bank-sum"></p>
+    <div class="bank-plot"><div class="bank-chart" id="bank-chart"></div><div id="bank-refs"></div></div>
     <div class="bank-axis" id="bank-axis" aria-hidden="true"></div>
   </section>
 
@@ -133,6 +142,17 @@ document.getElementById("bank-chart").innerHTML = F.map(f => {
   return `<a href="#f${f.floor}" title="F${f.floor} ${esc(f.encounter)}: banked ${s}" aria-label="Floor ${f.floor}, ${esc(f.encounter)}, banked ${s}">` +
     `<span style="height:${(s / MAX * 100).toFixed(1)}%"></span></a>`;
 }).join("");
+// Compare with Akabeko, which gives a flat 8 Vigor at the start of every combat.
+const AKABEKO = 8;
+const avg = xs => xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0;
+const banked = avg(F.filter(f => f.end).map(f => f.end.stash));
+const received = avg(F.filter(f => f.start).map(f => f.start.vigor));
+document.getElementById("bank-sum").innerHTML =
+  `Bloodlust banked <b>${banked.toFixed(1)}</b> per fight on average and opened fights with <b>${received.toFixed(1)}</b> ` +
+  `<span class="vg">Vigor</span> (the first fight gets none). Akabeko gives <b>${AKABEKO}</b> every fight.`;
+const ref = (cls, v, label) => `<div class="ref ${cls}" style="bottom:${(Math.min(v, MAX) / MAX * 100).toFixed(1)}%"><span>${label}</span></div>`;
+document.getElementById("bank-refs").innerHTML =
+  ref("akabeko", AKABEKO, `Akabeko ${AKABEKO}`) + ref("avg", banked, `Bloodlust avg ${banked.toFixed(1)}`);
 document.getElementById("bank-axis").innerHTML = F.map(f => `<span>${f.floor}</span>`).join("");
 
 const LABEL = { start: "start", end: "end" };
