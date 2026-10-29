@@ -5,6 +5,8 @@ A Slay the Spire 2 mod that adds one relic.
 **Bloodlust** (Rare, any character)
 > Overkill damage you deal is stored. At the start of your next combat, gain that much Vigor (max 15).
 
+- **Playtest 3** (cap 15): [Ironclad A10 on seed `BL00D11148`](https://rrenaud.github.io/sts2-bloodlust/playtest3/),
+  lost to Soul Fysh on floor 17; the first run with card reward screenshots.
 - **Playtest 2** (cap 15): [Ironclad A10 on seed `BL00D8901`](https://rrenaud.github.io/sts2-bloodlust/playtest2/),
   lost to the Act 1 boss, Soul Fysh, on floor 17.
 - **Playtest 1** (cap 20): [Ironclad A10 win on seed `BL00D7150`](https://rrenaud.github.io/sts2-bloodlust/playtest/),

@@ -2,7 +2,7 @@
   "id": "Bloodlust",
   "name": "Bloodlust",
   "author": "rrenaud",
-  "description": "Adds Bloodlust, a rare relic: overkill damage you deal is stored, and at the start of your next combat you gain that much Vigor (max 20).",
+  "description": "Adds Bloodlust, a rare relic: overkill damage you deal is stored, and at the start of your next combat you gain that much Vigor (max 15).",
   "version": "v0.1.0",
   "min_game_version": "0.111.0",
   "has_pck": false,
