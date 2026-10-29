@@ -68,7 +68,9 @@ blockquote cite { display: block; margin-top: 6px; font-style: normal; font-size
 .type.elite, .type.boss { color: var(--blood); font-weight: 600; }
 .flow { margin-left: auto; font-size: .9rem; font-variant-numeric: tabular-nums; }
 .flow .bk { color: var(--blood); font-weight: 600; }
-.strip { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.strip { display: grid; grid-template-columns: repeat(var(--k, 2), minmax(0, 1fr)); gap: 8px; }
+.cards { font-size: .9rem; color: var(--muted); }
+.cards b { color: var(--ink); }
 @media (max-width: 560px) { .strip { grid-template-columns: 1fr; } .flow { margin-left: 0; } }
 figure { margin: 0; min-width: 0; display: grid; gap: 3px; }
 figure button { all: unset; cursor: zoom-in; display: block; border-radius: 4px; overflow: hidden; }
@@ -126,7 +128,7 @@ dialog::backdrop { background: #07090d; }
 </dialog>
 
 <script>
-const DATA = {"seed": "BL00D8901", "ascension": 10, "win": false, "minutes": 17, "character": "Ironclad", "fights": [{"floor": 2, "encounter": "Toadpoles", "type": "monster", "turns": 8, "start": {"shot": "shots/f02_start.webp", "hp": 64, "max_hp": 80, "vigor": 0, "stash": 0}, "end": {"shot": "shots/f02_end.webp", "hp": 55, "max_hp": 80, "vigor": 0, "stash": 5}}, {"floor": 3, "encounter": "Sludge Spinner", "type": "monster", "turns": 6, "start": {"shot": "shots/f03_start.webp", "hp": 55, "max_hp": 80, "vigor": 5, "stash": 0}, "end": {"shot": "shots/f03_end.webp", "hp": 55, "max_hp": 80, "vigor": 0, "stash": 7}}, {"floor": 6, "encounter": "Seapunk", "type": "monster", "turns": 6, "start": {"shot": "shots/f06_start.webp", "hp": 55, "max_hp": 67, "vigor": 7, "stash": 0}, "end": {"shot": "shots/f06_end.webp", "hp": 52, "max_hp": 67, "vigor": 0, "stash": 6}}, {"floor": 8, "encounter": "Skulking Colony", "type": "elite", "turns": 7, "start": {"shot": "shots/f08_start.webp", "hp": 52, "max_hp": 67, "vigor": 6, "stash": 0}, "end": {"shot": "shots/f08_end.webp", "hp": 19, "max_hp": 67, "vigor": 0, "stash": 0}}, {"floor": 11, "encounter": "Cultists", "type": "monster", "turns": 5, "start": {"shot": "shots/f11_start.webp", "hp": 19, "max_hp": 67, "vigor": 0, "stash": 0}, "end": {"shot": "shots/f11_end.webp", "hp": 17, "max_hp": 67, "vigor": 0, "stash": 12}}, {"floor": 13, "encounter": "Phantasmal Gardeners", "type": "elite", "turns": 7, "start": {"shot": "shots/f13_start.webp", "hp": 37, "max_hp": 67, "vigor": 12, "stash": 0}, "end": {"shot": "shots/f13_end.webp", "hp": 34, "max_hp": 67, "vigor": 0, "stash": 3}}, {"floor": 14, "encounter": "Two Tailed Rats", "type": "monster", "turns": 4, "start": {"shot": "shots/f14_start.webp", "hp": 34, "max_hp": 67, "vigor": 3, "stash": 0}, "end": {"shot": "shots/f14_end.webp", "hp": 36, "max_hp": 67, "vigor": 0, "stash": 15}}, {"floor": 15, "encounter": "Terror Eel", "type": "elite", "turns": 8, "start": {"shot": "shots/f15_start.webp", "hp": 36, "max_hp": 67, "vigor": 15, "stash": 0}, "end": {"shot": "shots/f15_end.webp", "hp": 17, "max_hp": 67, "vigor": 0, "stash": 9}}, {"floor": 17, "encounter": "Soul Fysh", "type": "boss", "turns": 12, "start": {"shot": "shots/f17_start.webp", "hp": 37, "max_hp": 67, "vigor": 9, "stash": 0}, "end": {"shot": "shots/f17_end.webp", "hp": 0, "max_hp": 67, "vigor": 0, "stash": 0}}]};
+const DATA = {"seed": "BL00D8901", "ascension": 10, "win": false, "minutes": 17, "character": "Ironclad", "fights": [{"floor": 2, "encounter": "Toadpoles", "type": "monster", "turns": 8, "card_choices": [{"name": "Blood Wall", "picked": true}, {"name": "Rampage", "picked": false}, {"name": "Sword Boomerang", "picked": false}], "cards_shot": false, "start": {"shot": "shots/f02_start.webp", "hp": 64, "max_hp": 80, "vigor": 0, "stash": 0}, "end": {"shot": "shots/f02_end.webp", "hp": 55, "max_hp": 80, "vigor": 0, "stash": 5}}, {"floor": 3, "encounter": "Sludge Spinner", "type": "monster", "turns": 6, "card_choices": [{"name": "Infernal Blade", "picked": true}, {"name": "Cinder", "picked": false}, {"name": "Bully", "picked": false}], "cards_shot": false, "start": {"shot": "shots/f03_start.webp", "hp": 55, "max_hp": 80, "vigor": 5, "stash": 0}, "end": {"shot": "shots/f03_end.webp", "hp": 55, "max_hp": 80, "vigor": 0, "stash": 7}}, {"floor": 6, "encounter": "Seapunk", "type": "monster", "turns": 6, "card_choices": [{"name": "True Grit", "picked": true}, {"name": "Anger", "picked": false}, {"name": "Headbutt", "picked": false}], "cards_shot": false, "start": {"shot": "shots/f06_start.webp", "hp": 55, "max_hp": 67, "vigor": 7, "stash": 0}, "end": {"shot": "shots/f06_end.webp", "hp": 52, "max_hp": 67, "vigor": 0, "stash": 6}}, {"floor": 8, "encounter": "Skulking Colony", "type": "elite", "turns": 7, "card_choices": [{"name": "Flame Barrier", "picked": true}, {"name": "Drum Of Battle", "picked": false}, {"name": "Thunderclap", "picked": false}], "cards_shot": false, "start": {"shot": "shots/f08_start.webp", "hp": 52, "max_hp": 67, "vigor": 6, "stash": 0}, "end": {"shot": "shots/f08_end.webp", "hp": 19, "max_hp": 67, "vigor": 0, "stash": 0}}, {"floor": 11, "encounter": "Cultists", "type": "monster", "turns": 5, "card_choices": [{"name": "Inflame", "picked": true}, {"name": "Juggling", "picked": false}, {"name": "Taunt", "picked": false}], "cards_shot": false, "start": {"shot": "shots/f11_start.webp", "hp": 19, "max_hp": 67, "vigor": 0, "stash": 0}, "end": {"shot": "shots/f11_end.webp", "hp": 17, "max_hp": 67, "vigor": 0, "stash": 12}}, {"floor": 13, "encounter": "Phantasmal Gardeners", "type": "elite", "turns": 7, "card_choices": [{"name": "Colossus", "picked": true}, {"name": "Body Slam", "picked": false}, {"name": "Tremble", "picked": false}], "cards_shot": false, "start": {"shot": "shots/f13_start.webp", "hp": 37, "max_hp": 67, "vigor": 12, "stash": 0}, "end": {"shot": "shots/f13_end.webp", "hp": 34, "max_hp": 67, "vigor": 0, "stash": 3}}, {"floor": 14, "encounter": "Two Tailed Rats", "type": "monster", "turns": 4, "card_choices": [{"name": "Tremble", "picked": true}, {"name": "Taunt", "picked": false}, {"name": "Breakthrough", "picked": false}], "cards_shot": false, "start": {"shot": "shots/f14_start.webp", "hp": 34, "max_hp": 67, "vigor": 3, "stash": 0}, "end": {"shot": "shots/f14_end.webp", "hp": 36, "max_hp": 67, "vigor": 0, "stash": 15}}, {"floor": 15, "encounter": "Terror Eel", "type": "elite", "turns": 8, "card_choices": [{"name": "Forgotten Ritual", "picked": true}, {"name": "Pillage", "picked": false}, {"name": "Thunderclap", "picked": false}], "cards_shot": false, "start": {"shot": "shots/f15_start.webp", "hp": 36, "max_hp": 67, "vigor": 15, "stash": 0}, "end": {"shot": "shots/f15_end.webp", "hp": 17, "max_hp": 67, "vigor": 0, "stash": 9}}, {"floor": 17, "encounter": "Soul Fysh", "type": "boss", "turns": 12, "card_choices": [], "cards_shot": false, "start": {"shot": "shots/f17_start.webp", "hp": 37, "max_hp": 67, "vigor": 9, "stash": 0}, "end": {"shot": "shots/f17_end.webp", "hp": 0, "max_hp": 67, "vigor": 0, "stash": 0}}]};
 const MAX = 15;
 const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const F = DATA.fights;
@@ -155,13 +157,23 @@ document.getElementById("bank-refs").innerHTML =
   ref("akabeko", AKABEKO, `Akabeko ${AKABEKO}`) + ref("avg", banked, `Bloodlust avg ${banked.toFixed(1)}`);
 document.getElementById("bank-axis").innerHTML = F.map(f => `<span>${f.floor}</span>`).join("");
 
-const LABEL = { start: "start", end: "end" };
+// The card reward from the run history: the taken card in bold, or "skipped".
+function cardsText(f) {
+  const names = f.card_choices.map(c => c.picked ? `<b>${esc(c.name)}</b>` : esc(c.name)).join(" · ");
+  return `Cards: ${names}${f.card_choices.some(c => c.picked) ? "" : " (skipped)"}`;
+}
+const took = f => { const t = (f.card_choices || []).filter(c => c.picked).map(c => c.name).join(", "); return t ? "took " + t : "skipped"; };
+const CAPTION = {
+  start: s => `Turn 1 · Vigor ${s.vigor} · HP ${s.hp}/${s.max_hp}`,
+  end: s => `End · banked ${s.stash} · HP ${s.hp}/${s.max_hp}`,
+  cards: (s, f) => `Card reward · ${took(f)}`,
+};
 function fig(f, kind) {
   const s = f[kind];
   if (!s) return "";
-  const text = kind === "start" ? `Turn 1 · Vigor ${s.vigor} · HP ${s.hp}/${s.max_hp}` : `End · banked ${s.stash} · HP ${s.hp}/${s.max_hp}`;
+  const text = CAPTION[kind](s, f);
   const cap = `F${f.floor} ${f.encounter} · ${text}`;
-  // Every screenshot has a stable URL, #f<floor>-start / #f<floor>-end, that opens it in the viewer.
+  // Every screenshot has a stable URL, #f<floor>-start / -end / -cards, that opens it in the viewer.
   const id = `f${f.floor}-${kind}`;
   return `<figure><button type="button" data-id="${id}" data-floor="${f.floor}" data-src="${esc(s.shot)}" data-cap="${esc(cap)}"><img loading="lazy" src="${esc(s.shot)}" alt="${esc(cap)}"></button>` +
     `<figcaption>${esc(text)}<a class="plink" href="#${id}" title="Link to this screenshot">#</a></figcaption></figure>`;
@@ -170,7 +182,8 @@ document.getElementById("fights").innerHTML = F.map(f => `<section class="fight"
   <div class="head"><span class="floor">F${f.floor}</span><h2>${esc(f.encounter)}</h2>
     <span class="type ${esc(f.type)}">${esc(f.type)}${f.turns ? " · " + f.turns + " turns" : ""}</span>
     <span class="flow"><span class="vg">Vigor ${f.start ? f.start.vigor : "?"}</span> → <span class="bk">banked ${f.end ? f.end.stash : "?"}</span></span></div>
-  <div class="strip">${fig(f, "start")}${fig(f, "end")}</div>
+  ${f.card_choices && f.card_choices.length ? `<p class="cards">${cardsText(f)}</p>` : ""}
+  <div class="strip" style="--k:${f.cards_shot ? 3 : 2}">${fig(f, "start")}${fig(f, "end")}${fig(f, "cards")}</div>
 </section>`).join("");
 
 const dlg = document.getElementById("viewer");

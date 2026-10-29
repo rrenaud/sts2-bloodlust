@@ -52,7 +52,7 @@ mod picks up the next time the main menu appears, and starts that run directly, 
 launches the game if it isn't running. With a run in progress it does nothing unless `--abandon` is given, which
 abandons that run the way the main menu does.
 
-**Fight screenshots.** The mod saves a screenshot when your first turn of each fight starts and when the fight ends,
+**Fight screenshots.** The mod saves a screenshot when your first turn of each fight starts, when the fight ends, and of its card reward screen,
 to `~/.local/share/SlayTheSpire2/bloodlust_screenshots/<run start>/`, with a `log.txt` of HP, Vigor and the
 stored amount for each one. `scripts/build_playtest.py` turns a run's folders (one per session, if you Save & Quit) plus its
 run-history file into a page like the playtests above.

@@ -68,7 +68,9 @@ blockquote cite { display: block; margin-top: 6px; font-style: normal; font-size
 .type.elite, .type.boss { color: var(--blood); font-weight: 600; }
 .flow { margin-left: auto; font-size: .9rem; font-variant-numeric: tabular-nums; }
 .flow .bk { color: var(--blood); font-weight: 600; }
-.strip { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.strip { display: grid; grid-template-columns: repeat(var(--k, 2), minmax(0, 1fr)); gap: 8px; }
+.cards { font-size: .9rem; color: var(--muted); }
+.cards b { color: var(--ink); }
 @media (max-width: 560px) { .strip { grid-template-columns: 1fr; } .flow { margin-left: 0; } }
 figure { margin: 0; min-width: 0; display: grid; gap: 3px; }
 figure button { all: unset; cursor: zoom-in; display: block; border-radius: 4px; overflow: hidden; }
@@ -155,13 +157,23 @@ document.getElementById("bank-refs").innerHTML =
   ref("akabeko", AKABEKO, `Akabeko ${AKABEKO}`) + ref("avg", banked, `Bloodlust avg ${banked.toFixed(1)}`);
 document.getElementById("bank-axis").innerHTML = F.map(f => `<span>${f.floor}</span>`).join("");
 
-const LABEL = { start: "start", end: "end" };
+// The card reward from the run history: the taken card in bold, or "skipped".
+function cardsText(f) {
+  const names = f.card_choices.map(c => c.picked ? `<b>${esc(c.name)}</b>` : esc(c.name)).join(" · ");
+  return `Cards: ${names}${f.card_choices.some(c => c.picked) ? "" : " (skipped)"}`;
+}
+const took = f => { const t = (f.card_choices || []).filter(c => c.picked).map(c => c.name).join(", "); return t ? "took " + t : "skipped"; };
+const CAPTION = {
+  start: s => `Turn 1 · Vigor ${s.vigor} · HP ${s.hp}/${s.max_hp}`,
+  end: s => `End · banked ${s.stash} · HP ${s.hp}/${s.max_hp}`,
+  cards: (s, f) => `Card reward · ${took(f)}`,
+};
 function fig(f, kind) {
   const s = f[kind];
   if (!s) return "";
-  const text = kind === "start" ? `Turn 1 · Vigor ${s.vigor} · HP ${s.hp}/${s.max_hp}` : `End · banked ${s.stash} · HP ${s.hp}/${s.max_hp}`;
+  const text = CAPTION[kind](s, f);
   const cap = `F${f.floor} ${f.encounter} · ${text}`;
-  // Every screenshot has a stable URL, #f<floor>-start / #f<floor>-end, that opens it in the viewer.
+  // Every screenshot has a stable URL, #f<floor>-start / -end / -cards, that opens it in the viewer.
   const id = `f${f.floor}-${kind}`;
   return `<figure><button type="button" data-id="${id}" data-floor="${f.floor}" data-src="${esc(s.shot)}" data-cap="${esc(cap)}"><img loading="lazy" src="${esc(s.shot)}" alt="${esc(cap)}"></button>` +
     `<figcaption>${esc(text)}<a class="plink" href="#${id}" title="Link to this screenshot">#</a></figcaption></figure>`;
@@ -170,7 +182,8 @@ document.getElementById("fights").innerHTML = F.map(f => `<section class="fight"
   <div class="head"><span class="floor">F${f.floor}</span><h2>${esc(f.encounter)}</h2>
     <span class="type ${esc(f.type)}">${esc(f.type)}${f.turns ? " · " + f.turns + " turns" : ""}</span>
     <span class="flow"><span class="vg">Vigor ${f.start ? f.start.vigor : "?"}</span> → <span class="bk">banked ${f.end ? f.end.stash : "?"}</span></span></div>
-  <div class="strip">${fig(f, "start")}${fig(f, "end")}</div>
+  ${f.card_choices && f.card_choices.length ? `<p class="cards">${cardsText(f)}</p>` : ""}
+  <div class="strip" style="--k:${f.cards_shot ? 3 : 2}">${fig(f, "start")}${fig(f, "end")}${fig(f, "cards")}</div>
 </section>`).join("");
 
 const dlg = document.getElementById("viewer");

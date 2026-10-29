@@ -5,7 +5,7 @@
 
 SCREENSHOT_DIR is a run's folder under user://bloodlust_screenshots (PNGs + log.txt); a run resumed after Save & Quit
 has one folder per session, so pass them all in order. RUN_FILE is that run's saves/history/<id>.run. Writes
-OUT_DIR/index.html, OUT_DIR/log.txt and OUT_DIR/shots/f<floor>_<kind>.webp (1280px wide).
+OUT_DIR/index.html, OUT_DIR/log.txt and OUT_DIR/shots/f<floor>_<kind>.webp (1280px wide); <kind> is start, end or cards.
 """
 import argparse
 import html
@@ -40,10 +40,13 @@ floor = 0
 for act in run['map_point_history']:
     for point in act:
         floor += 1
+        stats = point.get('player_stats') or [{}]
         for room in point.get('rooms', []):
             if room.get('room_type') in ('monster', 'elite', 'boss'):
+                cards = [{'name': pretty(c['card']['id']) + '+' * c['card'].get('current_upgrade_level', 0),
+                          'picked': c['was_picked']} for c in stats[0].get('card_choices', [])]
                 rooms[floor] = {'encounter': pretty(room['model_id']), 'type': room['room_type'],
-                                'turns': room.get('turns_taken')}
+                                'turns': room.get('turns_taken'), 'card_choices': cards}
 
 (out / 'shots').mkdir(parents=True, exist_ok=True)
 fights = {}
@@ -66,6 +69,7 @@ for shots_dir in args.shot_dirs:
         image.resize((1280, round(image.height * 1280 / image.width)), Image.LANCZOS).save(out / webp, 'WEBP',
                                                                                              quality=78, method=6)
         hp, max_hp = info['HP'].split('/')
+        fight['cards_shot'] = fight.get('cards_shot') or kind == 'cards'
         fight[kind] = {'shot': webp, 'hp': int(hp), 'max_hp': int(max_hp), 'vigor': int(info['Vigor']),
                        'stash': int(info['stash'])}
 
