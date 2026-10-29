@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bloodlust Playtest 2</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kreon:wght@600&family=Source+Sans+3:wght@400;600&display=swap">
+<style>
+/* One quiet column: header, note, a bank track across the run, then one row per fight (start + end shot). */
+:root {
+  --bg: #f6f3f2; --ink: #221a1a; --muted: #75686a; --line: #e2d9d8; --panel: #fffdfc;
+  --blood: #a3202b; --vigor: #2e8a4e; --track: #ece4e3;
+  --display: "Kreon", Georgia, serif; --body: "Source Sans 3", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #161112; --ink: #efe6e6; --muted: #a2938f; --line: #33292a; --panel: #1e1718;
+  --blood: #e2525d; --vigor: #6fd395; --track: #2a2122; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #161112; --ink: #efe6e6; --muted: #a2938f; --line: #33292a; --panel: #1e1718;
+  --blood: #e2525d; --vigor: #6fd395; --track: #2a2122; color-scheme: dark }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 var(--body); }
+img { max-width: 100%; }
+a { color: var(--blood); }
+.wrap { max-width: 1040px; margin: 0 auto; padding-block: 28px 56px; display: grid; gap: 28px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1, h2 { font-family: var(--display); font-weight: 600; margin: 0; line-height: 1.2; }
+h1 { font-size: 1.7rem; }
+h2 { font-size: 1.1rem; }
+p { margin: 0; }
+.muted { color: var(--muted); }
+.hint { font-size: .85rem; color: var(--muted); }
+.hint kbd { font: inherit; border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; }
+header { display: grid; gap: 6px; }
+.relic { max-width: 62ch; }
+.relic b { color: var(--blood); }
+.vg { color: var(--vigor); font-weight: 600; }
+
+blockquote { margin: 0; padding: 14px 18px; background: var(--panel); border: 1px solid var(--line);
+  border-left: 4px solid var(--blood); border-radius: 6px; max-width: 70ch; }
+blockquote p { font-family: var(--display); font-size: 1.15rem; }
+blockquote cite { display: block; margin-top: 6px; font-style: normal; font-size: .85rem; color: var(--muted); }
+
+.bank { display: grid; gap: 8px; }
+.bank-chart { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 3px; align-items: end; height: 96px;
+  border-bottom: 1px solid var(--line); }
+.bank-chart a { display: block; height: 100%; position: relative; border-radius: 2px 2px 0 0; background: var(--track); }
+.bank-chart a span { position: absolute; left: 0; right: 0; bottom: 0; background: var(--blood); border-radius: 2px 2px 0 0; }
+.bank-chart a:hover span, .bank-chart a:focus-visible span { filter: brightness(1.2); }
+.bank-chart a:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.bank-axis { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 3px; font-size: .7rem; color: var(--muted);
+  font-variant-numeric: tabular-nums; text-align: center; }
+.bank-axis span:nth-child(odd) { visibility: hidden; }
+@media (min-width: 720px) { .bank-axis span:nth-child(odd) { visibility: visible; } }
+
+.fight { display: grid; gap: 8px; scroll-margin-top: 16px; padding-top: 18px; border-top: 1px solid var(--line); }
+.head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
+.floor { font-size: .8rem; color: var(--muted); font-variant-numeric: tabular-nums; min-width: 2.4em; }
+.type { font-size: .75rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.type.elite, .type.boss { color: var(--blood); font-weight: 600; }
+.flow { margin-left: auto; font-size: .9rem; font-variant-numeric: tabular-nums; }
+.flow .bk { color: var(--blood); font-weight: 600; }
+.strip { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+@media (max-width: 560px) { .strip { grid-template-columns: 1fr; } .flow { margin-left: 0; } }
+figure { margin: 0; min-width: 0; display: grid; gap: 3px; }
+figure button { all: unset; cursor: zoom-in; display: block; border-radius: 4px; overflow: hidden; }
+figure button:focus-visible { outline: 3px solid var(--blood); outline-offset: 2px; }
+figure img { display: block; width: 100%; aspect-ratio: 1854 / 1042; object-fit: cover; background: var(--line); }
+figcaption { font-size: .8rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+dialog { padding: 0; border: 0; margin: 0; width: 100vw; height: 100vh; max-width: none; max-height: none; background: #07090d; overflow: hidden; }
+dialog::backdrop { background: #07090d; }
+.v-stage { position: absolute; inset: 0 0 44px; display: grid; place-items: center; padding: max(8px, env(safe-area-inset-top, 0px)) 56px 0; }
+.v-stage img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; user-select: none; -webkit-user-drag: none; }
+.v-bar { position: absolute; left: 0; right: 0; bottom: 0; height: 44px; display: flex; align-items: center; gap: 12px; color: #d9dde3; font-size: .9rem;
+  padding: 0 max(16px, env(safe-area-inset-right, 0px)) env(safe-area-inset-bottom, 0px) max(16px, env(safe-area-inset-left, 0px)); }
+.v-cap { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.v-count { font-variant-numeric: tabular-nums; }
+.v-link { border: 1px solid #3a4250; border-radius: 4px; background: transparent; color: inherit; font: inherit; font-size: .85rem; padding: 2px 10px; cursor: pointer; }
+.v-link:hover, .v-link:focus-visible { border-color: #d9dde3; outline: none; }
+.plink { color: var(--muted); text-decoration: none; margin-left: 6px; }
+.plink:hover, .plink:focus-visible { color: var(--blood); text-decoration: underline; }
+.v-nav { position: absolute; top: 0; bottom: 44px; width: 56px; border: 0; background: transparent; color: #fff; font-size: 2rem; cursor: pointer; opacity: .4; }
+.v-nav:hover, .v-nav:focus-visible { opacity: 1; outline: none; }
+.v-prev { left: 0; } .v-next { right: 0; }
+@media (max-width: 640px) { .v-stage { padding-inline: 4px; } .v-nav { width: 40px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Bloodlust Playtest 2</h1>
+    <p class="muted" id="runline"></p>
+    <p class="relic"><b>Bloodlust</b> (Rare relic): overkill damage you deal is stored, and at the start of your next combat
+      you gain that much <span class="vg">Vigor</span>, up to 15.
+      <a href="https://github.com/rrenaud/sts2-bloodlust">Source</a> · <a href="../">All playtests</a></p>
+  </header>
+
+
+  <section class="bank" aria-labelledby="bank-h">
+    <h2 id="bank-h">Overkill banked per fight</h2>
+    <p class="hint">Each bar is what that fight stored, out of 15, and is the <span class="vg">Vigor</span> the next fight
+      opened with. Click a bar to jump to the fight.</p>
+    <div class="bank-chart" id="bank-chart"></div>
+    <div class="bank-axis" id="bank-axis" aria-hidden="true"></div>
+  </section>
+
+  <p class="hint">Each fight has a screenshot at the start of turn 1 and at the end. <kbd>→</kbd> flips through all of them.</p>
+  <div id="fights" style="display:grid;gap:28px"></div>
+</div>
+
+<dialog id="viewer" aria-label="Screenshot viewer">
+  <div class="v-stage" id="v-stage"><img id="viewer-img" alt=""></div>
+  <button class="v-nav v-prev" id="v-prev" type="button" aria-label="Previous screenshot">‹</button>
+  <button class="v-nav v-next" id="v-next" type="button" aria-label="Next screenshot">›</button>
+  <div class="v-bar"><span class="v-cap" id="viewer-cap"></span><button class="v-link" id="v-link" type="button">Copy link</button><span class="v-count" id="v-count"></span></div>
+</dialog>
+
+<script>
+const DATA = {"seed": "BL00D8901", "ascension": 10, "win": false, "minutes": 17, "character": "Ironclad", "fights": [{"floor": 2, "encounter": "Toadpoles", "type": "monster", "turns": 8, "start": {"shot": "shots/f02_start.webp", "hp": 64, "max_hp": 80, "vigor": 0, "stash": 0}, "end": {"shot": "shots/f02_end.webp", "hp": 55, "max_hp": 80, "vigor": 0, "stash": 5}}, {"floor": 3, "encounter": "Sludge Spinner", "type": "monster", "turns": 6, "start": {"shot": "shots/f03_start.webp", "hp": 55, "max_hp": 80, "vigor": 5, "stash": 0}, "end": {"shot": "shots/f03_end.webp", "hp": 55, "max_hp": 80, "vigor": 0, "stash": 7}}, {"floor": 6, "encounter": "Seapunk", "type": "monster", "turns": 6, "start": {"shot": "shots/f06_start.webp", "hp": 55, "max_hp": 67, "vigor": 7, "stash": 0}, "end": {"shot": "shots/f06_end.webp", "hp": 52, "max_hp": 67, "vigor": 0, "stash": 6}}, {"floor": 8, "encounter": "Skulking Colony", "type": "elite", "turns": 7, "start": {"shot": "shots/f08_start.webp", "hp": 52, "max_hp": 67, "vigor": 6, "stash": 0}, "end": {"shot": "shots/f08_end.webp", "hp": 19, "max_hp": 67, "vigor": 0, "stash": 0}}, {"floor": 11, "encounter": "Cultists", "type": "monster", "turns": 5, "start": {"shot": "shots/f11_start.webp", "hp": 19, "max_hp": 67, "vigor": 0, "stash": 0}, "end": {"shot": "shots/f11_end.webp", "hp": 17, "max_hp": 67, "vigor": 0, "stash": 12}}, {"floor": 13, "encounter": "Phantasmal Gardeners", "type": "elite", "turns": 7, "start": {"shot": "shots/f13_start.webp", "hp": 37, "max_hp": 67, "vigor": 12, "stash": 0}, "end": {"shot": "shots/f13_end.webp", "hp": 34, "max_hp": 67, "vigor": 0, "stash": 3}}, {"floor": 14, "encounter": "Two Tailed Rats", "type": "monster", "turns": 4, "start": {"shot": "shots/f14_start.webp", "hp": 34, "max_hp": 67, "vigor": 3, "stash": 0}, "end": {"shot": "shots/f14_end.webp", "hp": 36, "max_hp": 67, "vigor": 0, "stash": 15}}, {"floor": 15, "encounter": "Terror Eel", "type": "elite", "turns": 8, "start": {"shot": "shots/f15_start.webp", "hp": 36, "max_hp": 67, "vigor": 15, "stash": 0}, "end": {"shot": "shots/f15_end.webp", "hp": 17, "max_hp": 67, "vigor": 0, "stash": 9}}, {"floor": 17, "encounter": "Soul Fysh", "type": "boss", "turns": 12, "start": {"shot": "shots/f17_start.webp", "hp": 37, "max_hp": 67, "vigor": 9, "stash": 0}, "end": {"shot": "shots/f17_end.webp", "hp": 0, "max_hp": 67, "vigor": 0, "stash": 0}}]};
+const MAX = 15;
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const F = DATA.fights;
+
+const capped = F.filter(f => f.end && f.end.stash >= MAX).length;
+document.getElementById("runline").textContent =
+  `${DATA.character} · A${DATA.ascension} · seed ${DATA.seed} · ${DATA.win ? "won" : "lost"} in ${DATA.minutes} min · ` +
+  `${F.length} fights, ${capped} banked the full ${MAX}`;
+
+for (const id of ["bank-chart", "bank-axis"]) document.getElementById(id).style.setProperty("--n", F.length);
+document.getElementById("bank-chart").innerHTML = F.map(f => {
+  const s = f.end ? f.end.stash : 0;
+  return `<a href="#f${f.floor}" title="F${f.floor} ${esc(f.encounter)}: banked ${s}" aria-label="Floor ${f.floor}, ${esc(f.encounter)}, banked ${s}">` +
+    `<span style="height:${(s / MAX * 100).toFixed(1)}%"></span></a>`;
+}).join("");
+document.getElementById("bank-axis").innerHTML = F.map(f => `<span>${f.floor}</span>`).join("");
+
+const LABEL = { start: "start", end: "end" };
+function fig(f, kind) {
+  const s = f[kind];
+  if (!s) return "";
+  const text = kind === "start" ? `Turn 1 · Vigor ${s.vigor} · HP ${s.hp}/${s.max_hp}` : `End · banked ${s.stash} · HP ${s.hp}/${s.max_hp}`;
+  const cap = `F${f.floor} ${f.encounter} · ${text}`;
+  // Every screenshot has a stable URL, #f<floor>-start / #f<floor>-end, that opens it in the viewer.
+  const id = `f${f.floor}-${kind}`;
+  return `<figure><button type="button" data-id="${id}" data-floor="${f.floor}" data-src="${esc(s.shot)}" data-cap="${esc(cap)}"><img loading="lazy" src="${esc(s.shot)}" alt="${esc(cap)}"></button>` +
+    `<figcaption>${esc(text)}<a class="plink" href="#${id}" title="Link to this screenshot">#</a></figcaption></figure>`;
+}
+document.getElementById("fights").innerHTML = F.map(f => `<section class="fight" id="f${f.floor}">
+  <div class="head"><span class="floor">F${f.floor}</span><h2>${esc(f.encounter)}</h2>
+    <span class="type ${esc(f.type)}">${esc(f.type)}${f.turns ? " · " + f.turns + " turns" : ""}</span>
+    <span class="flow"><span class="vg">Vigor ${f.start ? f.start.vigor : "?"}</span> → <span class="bk">banked ${f.end ? f.end.stash : "?"}</span></span></div>
+  <div class="strip">${fig(f, "start")}${fig(f, "end")}</div>
+</section>`).join("");
+
+const dlg = document.getElementById("viewer");
+const vImg = document.getElementById("viewer-img");
+const SHOTS = [...document.querySelectorAll("figure button[data-src]")].map(b => b.dataset);
+const cache = {};
+let cur = 0;
+function preload(i) { const s = SHOTS[i]; if (s && !cache[s.src]) { cache[s.src] = new Image(); cache[s.src].src = s.src; } }
+function show(i) {
+  cur = (i + SHOTS.length) % SHOTS.length;
+  vImg.src = SHOTS[cur].src; vImg.alt = SHOTS[cur].cap;
+  document.getElementById("viewer-cap").textContent = SHOTS[cur].cap;
+  document.getElementById("v-count").textContent = `${cur + 1} / ${SHOTS.length}`;
+  document.getElementById("v-link").textContent = "Copy link";
+  // Keep the address bar on the open screenshot so it can be copied or shared as is.
+  history.replaceState(null, "", "#" + SHOTS[cur].id);
+  for (const d of [1, 2, 3, -1]) preload(cur + d);
+}
+function openAt(i) { show(i); if (!dlg.open) dlg.showModal(); }
+document.addEventListener("click", ev => {
+  const b = ev.target.closest("figure button[data-src]");
+  if (b) openAt(SHOTS.findIndex(s => s.src === b.dataset.src));
+});
+document.getElementById("v-prev").addEventListener("click", () => show(cur - 1));
+document.getElementById("v-next").addEventListener("click", () => show(cur + 1));
+document.getElementById("v-stage").addEventListener("click", ev => { if (ev.target !== vImg) dlg.close(); });
+// Closing leaves the URL on the fight, so a reload lands back there instead of reopening the viewer.
+dlg.addEventListener("close", () => history.replaceState(null, "", "#f" + SHOTS[cur].floor));
+document.getElementById("v-link").addEventListener("click", async ev => {
+  try { await navigator.clipboard.writeText(location.href); ev.target.textContent = "Copied"; }
+  catch { ev.target.textContent = location.hash; }
+});
+document.addEventListener("keydown", ev => {
+  if (ev.altKey || ev.ctrlKey || ev.metaKey) return;
+  const k = ev.key;
+  if (!dlg.open) { if (k === "ArrowRight" || k === "ArrowLeft") { ev.preventDefault(); openAt(k === "ArrowRight" ? cur : cur - 1); } return; }
+  if (k === "ArrowRight" || k === "ArrowDown" || k === " ") { ev.preventDefault(); show(cur + 1); }
+  else if (k === "ArrowLeft" || k === "ArrowUp") { ev.preventDefault(); show(cur - 1); }
+  else if (k === "Home") { ev.preventDefault(); show(0); }
+  else if (k === "End") { ev.preventDefault(); show(SHOTS.length - 1); }
+});
+function openFromHash() {
+  const i = SHOTS.findIndex(s => "#" + s.id === location.hash);
+  if (i >= 0) { openAt(i); return; }
+  // #photos / #photo-N: open the first or Nth screenshot.
+  const m = location.hash.match(/^#photos?(?:-(\d+))?$/);
+  if (m) { openAt(m[1] ? Math.min(Math.max(+m[1], 1), SHOTS.length) - 1 : 0); return; }
+  // Fights are rendered by this script, after the browser's own jump to the anchor, so jump again.
+  const fight = location.hash.length > 1 && document.getElementById(location.hash.slice(1));
+  if (fight) fight.scrollIntoView();
+}
+openFromHash();
+window.addEventListener("hashchange", openFromHash);
+let x0 = null;
+dlg.addEventListener("touchstart", ev => { x0 = ev.touches[0].clientX; }, { passive: true });
+dlg.addEventListener("touchend", ev => {
+  if (x0 === null) return;
+  const dx = ev.changedTouches[0].clientX - x0;
+  x0 = null;
+  if (Math.abs(dx) > 40) show(cur + (dx < 0 ? 1 : -1));
+});
+</script>
+</body>
+</html>

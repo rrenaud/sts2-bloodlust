@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Bloodlust Playtest 1</title>
+<title>Bloodlust Playtest {{NUMBER}}</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kreon:wght@600&family=Source+Sans+3:wght@400;600&display=swap">
 <style>
 /* One quiet column: header, note, a bank track across the run, then one row per fight (start + end shot). */
@@ -89,21 +89,17 @@ dialog::backdrop { background: #07090d; }
 <body>
 <div class="wrap">
   <header>
-    <h1>Bloodlust Playtest 1</h1>
+    <h1>Bloodlust Playtest {{NUMBER}}</h1>
     <p class="muted" id="runline"></p>
     <p class="relic"><b>Bloodlust</b> (Rare relic): overkill damage you deal is stored, and at the start of your next combat
-      you gain that much <span class="vg">Vigor</span>, up to 20.
-      <a href="https://github.com/rrenaud/sts2-bloodlust">Source</a></p>
+      you gain that much <span class="vg">Vigor</span>, up to {{CAP}}.
+      <a href="https://github.com/rrenaud/sts2-bloodlust">Source</a> · <a href="../">All playtests</a></p>
   </header>
 
-  <blockquote>
-    <p>Bloodlust gave the end of each battle real tension and tradeoffs. It generated meaningful choices.</p>
-    <cite>rrenaud, after the run</cite>
-  </blockquote>
-
+<!--QUOTE-->
   <section class="bank" aria-labelledby="bank-h">
     <h2 id="bank-h">Overkill banked per fight</h2>
-    <p class="hint">Each bar is what that fight stored, out of 20, and is the <span class="vg">Vigor</span> the next fight
+    <p class="hint">Each bar is what that fight stored, out of {{CAP}}, and is the <span class="vg">Vigor</span> the next fight
       opened with. Click a bar to jump to the fight.</p>
     <div class="bank-chart" id="bank-chart"></div>
     <div class="bank-axis" id="bank-axis" aria-hidden="true"></div>
@@ -122,7 +118,7 @@ dialog::backdrop { background: #07090d; }
 
 <script>
 const DATA = /*DATA*/null;
-const MAX = 20;
+const MAX = {{CAP}};
 const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const F = DATA.fights;
 

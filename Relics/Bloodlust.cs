@@ -18,7 +18,7 @@ namespace Bloodlust.Relics;
 [Pool(typeof(SharedRelicPool))]
 public sealed class Bloodlust : CustomRelicModel
 {
-    public const int MaxVigor = 20;
+    public const int MaxVigor = 15;
 
     private int _storedVigor;
 

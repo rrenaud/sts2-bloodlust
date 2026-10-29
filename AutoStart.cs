@@ -45,7 +45,7 @@ internal static class AutoStart
         }
         if (request?.Seed is not { Length: > 0 }) return;
         // Let the menu finish its first frame (buttons, run-save check) before leaving it.
-        Callable.From(() => TaskHelper.RunSafely(Start(__instance, request))).CallDeferred();
+        Callable.From(() => { TaskHelper.RunSafely(Start(__instance, request)); }).CallDeferred();
     }
 
     private static async Task Start(NMainMenu menu, Request request)

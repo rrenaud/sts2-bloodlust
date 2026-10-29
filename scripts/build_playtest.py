@@ -1,20 +1,30 @@
 #!/usr/bin/env python3
 """Build a playtest page from FightCapture's screenshots and the game's run-history file.
 
-    scripts/build_playtest.py SCREENSHOT_DIR RUN_FILE OUT_DIR
+    scripts/build_playtest.py OUT_DIR RUN_FILE SCREENSHOT_DIR... --number N --cap C [--quote TEXT]
 
-SCREENSHOT_DIR is one run's folder under user://bloodlust_screenshots (PNGs + log.txt); RUN_FILE is that run's
-saves/history/<id>.run. Writes OUT_DIR/index.html, OUT_DIR/log.txt and OUT_DIR/shots/*.webp (1280px wide).
+SCREENSHOT_DIR is a run's folder under user://bloodlust_screenshots (PNGs + log.txt); a run resumed after Save & Quit
+has one folder per session, so pass them all in order. RUN_FILE is that run's saves/history/<id>.run. Writes
+OUT_DIR/index.html, OUT_DIR/log.txt and OUT_DIR/shots/f<floor>_<kind>.webp (1280px wide).
 """
+import argparse
+import html
 import json
-import sys
 from pathlib import Path
 
 from PIL import Image
 
-shots_dir, run_file, out = Path(sys.argv[1]), Path(sys.argv[2]), Path(sys.argv[3])
+parser = argparse.ArgumentParser()
+parser.add_argument('out', type=Path)
+parser.add_argument('run_file', type=Path)
+parser.add_argument('shot_dirs', type=Path, nargs='+')
+parser.add_argument('--number', required=True, help='playtest number, for the title')
+parser.add_argument('--cap', type=int, required=True, help="the relic's Vigor cap during this run")
+parser.add_argument('--quote', help="the player's note, shown under the header")
+args = parser.parse_args()
+out = args.out
 template = (Path(__file__).parent / 'playtest_template.html').read_text()
-run = json.loads(run_file.read_text())
+run = json.loads(args.run_file.read_text())
 
 
 def pretty(model_id):
@@ -37,24 +47,34 @@ for act in run['map_point_history']:
 
 (out / 'shots').mkdir(parents=True, exist_ok=True)
 fights = {}
-for line in (shots_dir / 'log.txt').read_text().splitlines():
-    fields = line.split('\t')
-    png = fields[0]
-    # "HP 64/80", "Vigor 0", "Bloodlust stash 2": key on the last word before the value.
-    info = {k.split()[-1]: v for k, v in (f.rsplit(' ', 1) for f in fields[1:] if ' ' in f)}
-    _, floor_part, kind = png[:-4].split('_')
-    floor = int(floor_part.removeprefix('floor'))
-    webp = f'shots/{png[:-4]}.webp'
-    image = Image.open(shots_dir / png).convert('RGB')
-    image.resize((1280, round(image.height * 1280 / image.width)), Image.LANCZOS).save(out / webp, 'WEBP',
-                                                                                         quality=78, method=6)
-    hp, max_hp = info['HP'].split('/')
-    fight = fights.setdefault(floor, {'floor': floor, **rooms.get(floor, {'encounter': '?', 'type': 'monster'})})
-    fight[kind] = {'shot': webp, 'hp': int(hp), 'max_hp': int(max_hp), 'vigor': int(info['Vigor']),
-                   'stash': int(info['stash'])}
+log = []
+for shots_dir in args.shot_dirs:
+    for line in (shots_dir / 'log.txt').read_text().splitlines():
+        fields = line.split('\t')
+        png = fields[0]
+        # "HP 64/80", "Vigor 0", "Bloodlust stash 2": key on the last word before the value.
+        info = {k.split()[-1]: v for k, v in (f.rsplit(' ', 1) for f in fields[1:] if ' ' in f)}
+        _, floor_part, kind = png[:-4].split('_')
+        floor = int(floor_part.removeprefix('floor'))
+        fight = fights.setdefault(floor, {'floor': floor, **rooms.get(floor, {'encounter': '?', 'type': 'monster'})})
+        # Resuming a run retakes the fight's start shot; keep the first.
+        if kind in fight:
+            continue
+        log.append(line)
+        webp = f'shots/f{floor:02}_{kind}.webp'
+        image = Image.open(shots_dir / png).convert('RGB')
+        image.resize((1280, round(image.height * 1280 / image.width)), Image.LANCZOS).save(out / webp, 'WEBP',
+                                                                                             quality=78, method=6)
+        hp, max_hp = info['HP'].split('/')
+        fight[kind] = {'shot': webp, 'hp': int(hp), 'max_hp': int(max_hp), 'vigor': int(info['Vigor']),
+                       'stash': int(info['stash'])}
 
 data = {'seed': run['seed'], 'ascension': run['ascension'], 'win': run['win'], 'minutes': round(run['run_time'] / 60),
         'character': pretty(run['players'][0]['character']), 'fights': [fights[f] for f in sorted(fights)]}
-(out / 'index.html').write_text(template.replace('/*DATA*/null', json.dumps(data)))
-(out / 'log.txt').write_text((shots_dir / 'log.txt').read_text())
+quote = (f'<blockquote>\n    <p>{html.escape(args.quote)}</p>\n    <cite>rrenaud, after the run</cite>\n  </blockquote>\n'
+         if args.quote else '')
+page = (template.replace('{{NUMBER}}', html.escape(args.number)).replace('{{CAP}}', str(args.cap))
+        .replace('<!--QUOTE-->', quote).replace('/*DATA*/null', json.dumps(data)))
+(out / 'index.html').write_text(page)
+(out / 'log.txt').write_text(''.join(l + '\n' for l in log))
 print(f"{len(data['fights'])} fights -> {out / 'index.html'}")

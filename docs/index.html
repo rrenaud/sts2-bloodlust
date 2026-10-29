@@ -1,5 +1,23 @@
 <!doctype html>
+<html lang="en">
 <meta charset="utf-8">
-<title>Bloodlust</title>
-<meta http-equiv="refresh" content="0; url=playtest/">
-<a href="playtest/">Bloodlust playtest</a>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bloodlust Playtests</title>
+<style>
+  :root { color-scheme: light dark; --bg: #f6f2f1; --ink: #1d1a1a; --muted: #6b6262; --blood: #a3202b; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #141113; --ink: #ece6e6; --muted: #a59b9b; --blood: #e0505c; } }
+  :root[data-theme="dark"] { --bg: #141113; --ink: #ece6e6; --muted: #a59b9b; --blood: #e0505c; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.5 system-ui, sans-serif; }
+  main { max-width: 640px; margin: 0 auto; padding: 32px 16px; }
+  a { color: var(--blood); } p, li { color: var(--muted); } li b { color: var(--ink); }
+</style>
+<main>
+  <h1>Bloodlust playtests</h1>
+  <p>Bloodlust is a Slay the Spire 2 relic: overkill damage you deal is stored, and at the start of your next combat
+    you gain that much Vigor, up to a cap. <a href="https://github.com/rrenaud/sts2-bloodlust">Source</a></p>
+  <ul>
+    <li><a href="playtest2/"><b>Playtest 2</b></a>: Ironclad A10, seed BL00D8901, cap 15. Lost to the Act 1 boss.</li>
+    <li><a href="playtest/"><b>Playtest 1</b></a>: Ironclad A10, seed BL00D7150, cap 20. Won.</li>
+  </ul>
+</main>
+</html>

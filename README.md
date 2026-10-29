@@ -3,10 +3,12 @@
 A Slay the Spire 2 mod that adds one relic.
 
 **Bloodlust** (Rare, any character)
-> Overkill damage you deal is stored. At the start of your next combat, gain that much Vigor (max 20).
+> Overkill damage you deal is stored. At the start of your next combat, gain that much Vigor (max 15).
 
-- **Playtest 1:** [Ironclad A10 win on seed `BL00D7150`](https://rrenaud.github.io/sts2-bloodlust/playtest/), with a
-  screenshot at the start and end of all 24 fights and how much each fight banked (use ← → to flip through them).
+- **Playtest 2** (cap 15): [Ironclad A10 on seed `BL00D8901`](https://rrenaud.github.io/sts2-bloodlust/playtest2/),
+  lost to the Act 1 boss, Soul Fysh, on floor 17.
+- **Playtest 1** (cap 20): [Ironclad A10 win on seed `BL00D7150`](https://rrenaud.github.io/sts2-bloodlust/playtest/),
+  with a screenshot at the start and end of all 24 fights and how much each fight banked (use ← → to flip through them).
 
 > Bloodlust gave the end of each battle real tension and tradeoffs. It generated meaningful choices.
 >
@@ -21,7 +23,7 @@ A Slay the Spire 2 mod that adds one relic.
 - The stored amount is saved with the run, so it survives save & quit between fights.
 - There is no custom art yet: it borrows Red Skull's icon, which is confusing if you also own Red Skull.
 
-In the first playtest the cap was hit in 17 of 24 fights, from Act 2 on almost every fight.
+In the first playtest, with a cap of 20, the cap was hit in 17 of 24 fights, from Act 2 on almost every fight, so the cap is now 15.
 
 ## Getting it on floor 1
 
@@ -52,8 +54,8 @@ abandons that run the way the main menu does.
 
 **Fight screenshots.** The mod saves a screenshot when your first turn of each fight starts and when the fight ends,
 to `~/.local/share/SlayTheSpire2/bloodlust_screenshots/<run start>/`, with a `log.txt` of HP, Vigor and the
-stored amount for each one. `scripts/build_playtest.py` turns one run's folder plus its run-history file into a page
-like the playtest above.
+stored amount for each one. `scripts/build_playtest.py` turns a run's folders (one per session, if you Save & Quit) plus its
+run-history file into a page like the playtests above.
 
 **Seed search.** `tests/` is a console app that runs the installed game's own Neow option generator, relic
 grab-bag population and `RelicReward` against your profile's unlocks, without opening the game:
