@@ -23,7 +23,7 @@ using Relic = Bloodlust.Relics.Bloodlust;
 // Seed search: which seeds make Neow offer Small Capsule, and have its relic reward roll Bloodlust?
 // Runs the installed game's own Neow option generator, grab-bag population and RelicReward.Populate.
 // Only save access, Godot logging and option text are stubbed.
-//   dotnet run -c Release -- [--seed SEED] [--ascension N] [--progress path/to/progress.save] [--count N]
+//   dotnet run -c Release -- [--seed SEED] [--ascension N] [--progress path/to/progress.save] [--count N] [--from N] [--to N]
 TestMode.IsOn = true;
 var h = new Harmony("Bloodlust.SeedSearch");
 h.Patch(AccessTools.PropertyGetter(typeof(SaveManager), "Instance"), prefix: new HarmonyMethod(typeof(Stubs), nameof(Stubs.NoSaveManager)));
@@ -66,7 +66,8 @@ CharacterModel[] characters = [ModelDb.Character<Ironclad>(), ModelDb.Character<
     ModelDb.Character<Necrobinder>(), ModelDb.Character<Regent>()];
 
 int found = 0;
-for (int i = 1; i <= (requested == null ? 20000 : 1) && found < wanted; i++)
+int from = int.Parse(Arg("--from", "1")), to = int.Parse(Arg("--to", "20000"));
+for (int i = from; i <= (requested == null ? to : from) && found < wanted; i++)
 {
     string seed = SeedHelper.CanonicalizeSeed(requested ?? $"BLOOD{i}");
     var hits = new List<string>();
