@@ -3,8 +3,8 @@
 
     scripts/build_playtest.py OUT_DIR RUN_FILE SCREENSHOT_DIR... --number N --cap C [--quote TEXT]
 
-SCREENSHOT_DIR is a run's folder under user://bloodlust_screenshots (PNGs + log.txt); a run resumed after Save & Quit
-has one folder per session, so pass them all in order. RUN_FILE is that run's saves/history/<id>.run. Writes
+SCREENSHOT_DIR is a run's folder under user://bloodlust_screenshots (PNGs + log.txt); older versions split a run into
+one folder per Save & Quit session, so several can be passed, in order. RUN_FILE is that run's saves/history/<id>.run. Writes
 OUT_DIR/index.html, OUT_DIR/log.txt and OUT_DIR/shots/f<floor>_<kind>.webp (1280px wide); <kind> is start, end or cards.
 """
 import argparse

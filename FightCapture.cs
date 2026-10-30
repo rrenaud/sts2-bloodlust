@@ -11,7 +11,8 @@ using Relic = Bloodlust.Relics.Bloodlust;
 namespace Bloodlust;
 
 // Screenshots at the start of each fight (once the first player turn is ready, after Bloodlust's Vigor),
-// at its end, and of its card reward once the cards have animated in, into user://bloodlust_screenshots/<run start>/, with a log.txt of Vigor and stash per shot.
+// at its end, and of its card reward once the cards have animated in, into
+// user://bloodlust_screenshots/<run start>_<seed>/, with a log.txt of Vigor and stash per shot.
 // Purely observational: any error turns capturing off for the session instead of touching the game.
 internal static class FightCapture
 {
@@ -20,6 +21,10 @@ internal static class FightCapture
     private static RunState? _run;
     private static string? _directory;
     private static int _next;
+    // "floor17_start" etc. already in the folder: resuming after Save & Quit replays the fight from its start.
+    private static readonly HashSet<string> _taken = [];
+    private static readonly AccessTools.FieldRef<RunManager, long> StartTime =
+        AccessTools.FieldRefAccess<RunManager, long>("_startTime");
     private static bool _failed;
     // The floor whose fight just ended, and the last floor whose card reward was shot (one per fight).
     private static int _endedFloor = -1;
@@ -85,10 +90,19 @@ internal static class FightCapture
         if (!ReferenceEquals(run, _run))
         {
             _run = run;
-            _directory = Path.Combine(Root, DateTime.Now.ToString("yyyyMMdd_HHmmss"));
+            // One folder per run, named by the run's own start time (saved with the run), so Save & Quit and
+            // resuming keeps adding to the same folder.
+            var start = DateTimeOffset.FromUnixTimeSeconds(StartTime(RunManager.Instance)).LocalDateTime;
+            _directory = Path.Combine(Root, $"{start:yyyyMMdd_HHmmss}_{run.Rng.StringSeed}");
             Directory.CreateDirectory(_directory);
-            _next = 1;
+            var existing = Directory.GetFiles(_directory, "*.png").Select(Path.GetFileNameWithoutExtension).ToList();
+            _next = existing.Count + 1;
+            _taken.Clear();
+            foreach (var name in existing)
+                _taken.Add(name!.Substring(name.IndexOf('_') + 1));
         }
+        // The first shot of each floor and kind is kept; a resumed fight's retaken start is skipped.
+        if (!_taken.Add($"floor{run.TotalFloor:00}_{kind}")) return;
         var me = LocalContext.GetMe(run);
         var relic = me?.GetRelic<Relic>();
         string file = $"{_next++:000}_floor{run.TotalFloor:00}_{kind}.png";
