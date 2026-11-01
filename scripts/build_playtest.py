@@ -21,6 +21,7 @@ parser.add_argument('shot_dirs', type=Path, nargs='+')
 parser.add_argument('--number', required=True, help='playtest number, for the title')
 parser.add_argument('--cap', type=int, required=True, help="the relic's Vigor cap during this run")
 parser.add_argument('--quote', help="the player's note, shown under the header")
+parser.add_argument('--note', help='an explanation of something odd in the run, shown under the header')
 args = parser.parse_args()
 out = args.out
 template = (Path(__file__).parent / 'playtest_template.html').read_text()
@@ -78,7 +79,8 @@ data = {'seed': run['seed'], 'ascension': run['ascension'], 'win': run['win'], '
 quote = (f'<blockquote>\n    <p>{html.escape(args.quote)}</p>\n    <cite>rrenaud, after the run</cite>\n  </blockquote>\n'
          if args.quote else '')
 page = (template.replace('{{NUMBER}}', html.escape(args.number)).replace('{{CAP}}', str(args.cap))
-        .replace('<!--QUOTE-->', quote).replace('/*DATA*/null', json.dumps(data)))
+        .replace('<!--QUOTE-->', quote)
+        .replace('<!--NOTE-->', f'<p class="hint">{html.escape(args.note)}</p>\n' if args.note else '').replace('/*DATA*/null', json.dumps(data)))
 (out / 'index.html').write_text(page)
 (out / 'log.txt').write_text(''.join(l + '\n' for l in log))
 print(f"{len(data['fights'])} fights -> {out / 'index.html'}")
